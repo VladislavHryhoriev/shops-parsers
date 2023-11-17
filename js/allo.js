@@ -65,7 +65,8 @@ const handleClick = async () => {
 			form.products = trNodes;
 
 			const text = `
-          Алло: ${form.id}
+          Алло 
+			  ● ${form.id}
            ● ${form.products.map(
 				({ code, value, total }) => ` ${code} - ${value}шт = ${total}грн`
 			)}

@@ -49,7 +49,9 @@ const copyData = ({ orderId, client, delivery, products, total, karma }) => {
 		● ${client?.recipient}
 		● ${client?.phone}
 		● ${delivery?.provider}
+		● ${delivery?.paymentType}
 		● ${delivery?.city}
+		${(delivery?.street) ? "● " + delivery?.street : ''}
 		● ${karma}
 		>> ${delivery?.note}`
 		.replace(/\s+/g, " ")
@@ -57,7 +59,6 @@ const copyData = ({ orderId, client, delivery, products, total, karma }) => {
 
 	navigator.clipboard.writeText(text);
 
-	console.log(text);
 };
 
 const getData = () => {
@@ -65,11 +66,12 @@ const getData = () => {
 		const products = [];
 		let form = {};
 
-		for (const node of [...$all('.b-order-edit-table')]) {
+		for (const node of [...$all('[data-qaid="product_row"]')]) {
+			console.log();
 			products.push({
-				article: 0,
-				amount: 1 + 'шт',
-				price: 0
+				article: node.querySelector('.b-order-edit-table__main div:nth-child(3)').textContent.split(' ')[1],
+				amount: node.querySelector('[data-qaid="quantity_input"]').value + 'шт',
+				price: node.querySelector('[data-qaid="total_price"]').textContent
 			});
 		}
 
@@ -85,32 +87,32 @@ const getData = () => {
 				delivery: {
 					provider: $text('[data-qaid="nova_poshta_provider_name"]'),
 					city: $text('[data-qaid="deliveryAddress"]'),
-					note: $value('[data-qaid="textarea_field"]'),
+					paymentType: $text('[data-qaid="payment_types_dd"] span[title]:first-child'),
+					note: `${$value('[data-qaid="textarea_field"]')} ${$text('[data-qaid="client_comment"]')}`,
 				},
 				karma: $text('[data-qaid="successful_purchases"]')
 			};
 		}
 
-		// if ($text('[data-qaid="custom_provider_name"]')) {
-		// 	form = {
-		// 		orderId: $text('.qa_order_id').replace('№', ''),
-		// 		products: products,
-		// 		total: $text('[data-qaid="products_price"]'),
-		// 		client: {
-		// 			recipient: $text('[data-qaid="recipientFullName"]'),
-		// 			phone: $text('[data-qaid="recipientPhone"]').replace("+38", "").replace(/[^\d]/g, ""),
-		// 		},
-		// 		delivery: {
-		// 			provider: $text('[data-qaid="custom_provider_name"]'),
-		// 			city: 0,
-		// 			warehouse: 0,
-		// 			note: 0
-		// 		}
-		// 	};
-		// }
-
-
-		console.log(form);
+		if ($text('[data-qaid="custom_provider_name"]')) {
+			form = {
+				orderId: $text('.qa_order_id').replace('№', ''),
+				products: products,
+				total: $text('[data-qaid="products_price"]'),
+				client: {
+					recipient: $text('[data-qaid="recipientFullName"]'),
+					phone: $text('[data-qaid="recipientPhone"]').replace("+38", "").replace(/[^\d]/g, ""),
+				},
+				delivery: {
+					provider: $text('[data-qaid="custom_provider_name"]'),
+					city: $text('[data-qaid="deliveryCity"]'),
+					street: $text('[data-qaid="deliveryStreet"]'),
+					paymentType: $text('[data-qaid="payment_types_dd"]'),
+					note: `${$value('[data-qaid="textarea_field"]')} ${$text('[data-qaid="client_comment"]')}`,
+				},
+				karma: $text('[data-qaid="successful_purchases"]')
+			};
+		}
 
 		return form;
 	} catch (e) {
