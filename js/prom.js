@@ -1,7 +1,7 @@
 const $all = (selector) => document.querySelectorAll(selector);
 const $$ = (selector) => document.querySelector(selector);
 const $text = (selector) => document.querySelector(selector)?.innerText;
-const $value = (selector) => document.querySelector(selector).value;
+const $value = (selector) => document.querySelector(selector)?.value;
 const $style = (selector) => document.querySelector(selector).style;
 
 const createButton = (text, className, handler) => {
@@ -69,25 +69,30 @@ const getData = () => {
 		for (const node of [...$all('[data-qaid="product_row"]')]) {
 			console.log();
 			products.push({
-				article: node.querySelector('.b-order-edit-table__main div:nth-child(3)').textContent.split(' ')[1],
-				amount: node.querySelector('[data-qaid="quantity_input"]').value + 'шт',
-				price: node.querySelector('[data-qaid="total_price"]').textContent
+				// article: node.querySelector('.b-order-edit-table__main div:nth-child(3)').textContent.split(' ')[1],
+				article: node.querySelector('.b-order-edit-table__main div:nth-child(3)')?.textContent.split(' ')[1],
+				amount:
+					node.querySelector('[data-qaid="product_row"] .b-input > span')?.textContent.replace(' ', '') ||
+					node.querySelector('[data-qaid="quantity_input"]')?.value + 'шт',
+				price: node.querySelector('[data-qaid="total_price"]')?.textContent.replace(/\s/gi, '')
 			});
 		}
 
 		if ($text('[data-qaid="nova_poshta_provider_name"]')) {
 			form = {
-				orderId: $text('.qa_order_id').replace('№', ''),
+				orderId: $text('.qa_order_id').replace(/\D/g, ''),
 				products: products,
-				total: $text('[data-qaid="products_price"]'),
+				total: $text('[data-qaid="products_price"]').replace(/\s/gi, ''),
 				client: {
 					recipient: $text('[data-qaid="recipientFullName"]'),
-					phone: $text('[data-qaid="recipientPhone"]').replace("+38", ""),
+					phone: $text('[data-qaid="recipientPhone"]').replace(/\D38/gi, ''),
 				},
 				delivery: {
 					provider: $text('[data-qaid="nova_poshta_provider_name"]'),
 					city: $text('[data-qaid="deliveryAddress"]'),
-					paymentType: $text('[data-qaid="payment_types_dd"] span[title]:first-child'),
+					paymentType:
+						$text('[data-qaid="payment_types_dd"] span[title]:first-child') ||
+						$text('.qa_payment_dd span[title]:first-child'),
 					note: `${$value('[data-qaid="textarea_field"]')} ${$text('[data-qaid="client_comment"]')}`,
 				},
 				karma: $text('[data-qaid="successful_purchases"]')
@@ -96,12 +101,12 @@ const getData = () => {
 
 		if ($text('[data-qaid="custom_provider_name"]')) {
 			form = {
-				orderId: $text('.qa_order_id').replace('№', ''),
+				orderId: $text('.qa_order_id').replace(/\D/g, ''),
 				products: products,
-				total: $text('[data-qaid="products_price"]'),
+				total: $text('[data-qaid="products_price"]').replace(/\s/gi, ''),
 				client: {
 					recipient: $text('[data-qaid="recipientFullName"]'),
-					phone: $text('[data-qaid="recipientPhone"]').replace("+38", "").replace(/[^\d]/g, ""),
+					phone: $text('[data-qaid="recipientPhone"]').replace(/\D38/gi, ''),
 				},
 				delivery: {
 					provider: $text('[data-qaid="custom_provider_name"]'),

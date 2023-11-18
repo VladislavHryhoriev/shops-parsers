@@ -73,11 +73,12 @@ const handleClick = async () => {
            ● ${form.name}
            ● ${form.number}
            ● ${form.city ? form.city : "Город не указан"}
-           ● ${form.deliveryAddress ? form.deliveryAddress : "Склад не указан"}
-           ${form.house ? " ● Буд: " + form.house : ""}
-           ${form.apartment ? " ● Кв: " + form.apartment : ""}
-           >> ${form.note}
-           ● ${form.deliveryType}`
+           ● ${form.deliveryAddress ? form.deliveryAddress : (`
+					${form.street ? " Адресная: " + form.street : ""}
+					${form.house ? "буд. " + form.house : ""}
+					${form.apartment ? "кв. " + form.apartment : ""}`)}
+           ● ${form.deliveryType}
+           >> ${form.note}`
 				.replace(/\s+/g, " ")
 				.trim();
 
